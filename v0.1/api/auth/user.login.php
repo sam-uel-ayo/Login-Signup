@@ -11,5 +11,5 @@ CUtils::validatePayload($requiredKeys, $data);
 $data = CUtils::arrayToObject($data);
 
 //Logic here
-$user = CAuth::userLogin($data->email, $data->password);
+$user = CAuth::userLogin($data);
 return CUtils::outputData($user->status, $user->message, $user->data, true);
