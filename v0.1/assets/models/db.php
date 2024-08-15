@@ -6,7 +6,7 @@ use PDOException;
 class Database {
 
     static $DB_HOST = "localhost";
-    static $DB_NAME = "test";
+    static $DB_NAME = "sheda_mart";
     static $DB_USER = "root";
     static $DB_PASS = '';
 
