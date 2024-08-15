@@ -53,9 +53,9 @@ class CUtils {
         }
     }
 
-    
+
     // return data to be used in program
-    public static function returnData ($status= false,$message=null, $data=array(), $exit = false, $httpStatus=200) 
+    public static function returnData ($status= false, $message=null, $data=array(), $exit = false, $httpStatus=200) 
     {
         $output = array(
             'status' => $status,
@@ -88,4 +88,30 @@ class CUtils {
         }
         return null; // Return null if $data is not an object or array
     }
+
+
+    // validate email
+    public static function validateEmail($email=null)
+    {
+        if ($email==null) {
+            return cUtils::returnData(false, "Email data not found", $email, true);
+        }
+
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            list($user, $domain) = explode('@', $email);
+            if (checkdnsrr($domain, "MX")) {
+                // echo "The email address is valid and the domain has an MX record.";
+                return cUtils::returnData(true, "The email address is valid and the domain has an MX record.", $email, true);
+            } else {
+                // echo "The email address is valid, but the domain does not have an MX record.";
+                return cUtils::returnData(false, "The email address is valid, but the domain does not have an MX record.", $email, true);
+            }
+        } else {
+            return cUtils::returnData(false, "The email address is not valid.", $email, true);
+        }
+    }
+    // end validate email
+
+
+
 }
