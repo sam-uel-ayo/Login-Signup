@@ -11,20 +11,20 @@ class CAuth {
     public static function userLogin ($data) // Email and password
     {
         try {
-            // if (sizeof($data) < 2 ){
-            //     return json_decode(CUtils::returnData(false, "Data is Missing", $data, true));
-            // }
+            if ($data == null) {
+                return CUtils::returnData(false, "No data found", $data, true);
+            }
 
-            $checkUser = json_decode(MAuth::checkUserMail($data->email)); // $data[0] is email
+            $checkUser = json_decode(MAuth::checkUserMail($data->email)); // 
             if ($checkUser->status == false) {
                 return json_decode(CUtils::returnData($checkUser->status, "Please Signup", $data, true));
             }
 
             if ($checkUser->status == true) {
-                if ($data->password === $checkUser->data->password) {
-                    return json_decode(CUtils::returnData(true, "Logged In", $checkUser->data->id, true));
-                } else {
+                if (!password_verify($data->password, $checkUser->data->password)) {
                     return json_decode(CUtils::returnData(false, "Password Incorrect", $data, true));
+                } else {
+                    return json_decode(CUtils::returnData(true, "Logged In", $checkUser->data->id, true));
                 }
             }
         } catch (PDOException $e) {
@@ -37,9 +37,10 @@ class CAuth {
     public static function userSignup ($data) // Email, Password, Confirm password, First name, Last name as an object for validation of correct input
     {
         try{
-            // if ($data == null) {
-            //     return CUtils::returnData(false, "No data found", $data, true);
-            // }
+            if ($data == null) {
+                return CUtils::returnData(false, "No data found", $data, true);
+            }
+
             $checkMail = json_decode(MAuth::checkMail($data->email));
             if ($checkMail->status == false) {
                 return json_decode(CUtils::returnData($checkMail->status, "This email is Registered", $data->email, true));
@@ -77,7 +78,10 @@ class CAuth {
             if ($signupUser->status == false) {
                 return json_decode(CUtils::returnData(false, $signupUser->message, $signupUser->data, true));
             }
-        
+            
+            $subject = 'Welcome to Our Sheda Mart!';
+            $body = "<p> $firstname $lastname Thank you for registering with us. We're excited to have you on board!</p>";
+            $mailer = json_decode(CUtils::sendEmail($data->email, $subject, $body));
             return json_decode(CUtils::returnData(true, "Registration successful", $data, true));
 
         } catch (PDOException $e) {
