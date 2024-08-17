@@ -1,6 +1,6 @@
 <?php
 namespace CUtils;
-
+require ('../../vendor/autoload.php');
 
 class CUtils {
 
@@ -94,24 +94,57 @@ class CUtils {
     public static function validateEmail($email=null)
     {
         if ($email==null) {
-            return cUtils::returnData(false, "Email data not found", $email, true);
+            return self::returnData(false, "Email data not found", $email, true);
         }
 
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             list($user, $domain) = explode('@', $email);
             if (checkdnsrr($domain, "MX")) {
                 // echo "The email address is valid and the domain has an MX record.";
-                return cUtils::returnData(true, "The email address is valid and the domain has an MX record.", $email, true);
+                return self::returnData(true, "The email address is valid and the domain has an MX record.", $email, true);
             } else {
                 // echo "The email address is valid, but the domain does not have an MX record.";
-                return cUtils::returnData(false, "The email address is valid, but the domain does not have an MX record.", $email, true);
+                return self::returnData(false, "The email address is valid, but the domain does not have an MX record.", $email, true);
             }
         } else {
-            return cUtils::returnData(false, "The email address is not valid.", $email, true);
+            return self::returnData(false, "The email address is not valid.", $email, true);
         }
     }
     // end validate email
 
+
+    // Send Email function with ReniMail
+    public static function sendEmail($userEmail, $subject, $body) {
+        $request = new \HTTP_Request2();
+        $request->setUrl('https://sandbox.api.reni.tech/reni-mail/v1/sendSingleMail');
+        $request->setMethod(\HTTP_Request2::METHOD_POST);
+        $request->setHeader(array(
+            'Authorization' => 'Bearer reni_test_DJiC55T0OEJsJZPS4L4PSK', // Replace with your actual token
+            'Content-Type' => 'application/json'
+        ));
+        $request->setConfig(array(
+            'follow_redirects' => TRUE,
+            'ssl_verify_peer' => FALSE,  // Disable SSL verification
+            'ssl_verify_host' => FALSE   // Disable host verification
+        ));
+        $request->setBody(json_encode(array(
+            "email" => $userEmail,
+            "subject" => $subject,
+            "body" => $body,
+            "html" => "true"
+        )));
+
+        try {
+            $response = $request->send();
+            if ($response->getStatus() == 200) {
+                return self::returnData(true, 'Email sent successfully!');
+            } else {
+                return self::returnData(false, 'Unexpected HTTP status: ' . $response->getStatus() . ' ' . $response->getReasonPhrase());
+            }
+        } catch (\HTTP_Request2_Exception $e) {
+            return self::returnData(false, 'Error: ' . $e->getMessage());
+        }
+    } // End send mail
 
 
 }
