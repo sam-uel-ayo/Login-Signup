@@ -13,7 +13,7 @@ class MAuth {
     public static function checkUserMail ($email)
     {
         try {
-            $query = "SELECT id,  password FROM users WHERE email = :email";
+            $query = "SELECT id,  password FROM users_info WHERE email = :email";
             $stmt = Database::getConnection()->prepare($query);
 
             $stmt->bindParam(':email', $email, PDO::PARAM_STR);
