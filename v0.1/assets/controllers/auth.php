@@ -79,7 +79,7 @@ class CAuth {
                 return json_decode(CUtils::returnData(false, $signupUser->message, $signupUser->data, true));
             }
             
-            $subject = 'Welcome to Our Sheda Mart!';
+            $subject = 'Welcome to Our Shop!';
             $body = "<p> $firstname $lastname Thank you for registering with us. We're excited to have you on board!</p>";
             $mailer = json_decode(CUtils::sendEmail($data->email, $subject, $body));
             return json_decode(CUtils::returnData(true, "Registration successful", $data, true));
