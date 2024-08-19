@@ -59,31 +59,36 @@ class MAuth {
 
 
     // User Signup
-    public static function userSignup($email, $password, $first_name, $last_name)
+    public static function userSignup($email, $password, $firstname, $lastname, $auth=null)
     {
         $conn = Database::getConnection();
         try {
             $conn->beginTransaction();
     
-            $stmt1 = $conn->prepare("INSERT INTO users_info (email, password) VALUES (:email, :password)");
+            $stmt1 = $conn->prepare("INSERT INTO users_info (email, password, auth_type) VALUES (:email, :password, IFNULL(:auth, DEFAULT(auth_type)))");
             $stmt1->bindParam(':email', $email, PDO::PARAM_STR);
             $stmt1->bindParam(':password', $password);
+            $stmt1->bindParam(':auth', $auth);
             if (!$stmt1->execute()) {
                 throw new PDOException("Failed to insert into users_info");
             }
     
+            // Get last inserted ID
             $user_id = $conn->lastInsertId();
+            if (!$user_id) {
+                throw new PDOException("Failed to get last inserted ID");
+            }
     
             $stmt2 = $conn->prepare("INSERT INTO users_details (user_id, first_name, last_name) VALUES (:user_id, :first_name, :last_name)");
             $stmt2->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-            $stmt2->bindParam(':first_name', $first_name, PDO::PARAM_STR);
-            $stmt2->bindParam(':last_name', $last_name, PDO::PARAM_STR);
+            $stmt2->bindParam(':first_name', $firstname, PDO::PARAM_STR);
+            $stmt2->bindParam(':last_name', $lastname, PDO::PARAM_STR);
             if (!$stmt2->execute()) {
                 throw new PDOException("Failed to insert into users_details");
             }
     
             $conn->commit();
-            return CUtils::returnData(true, "Account created", [], true);
+            return CUtils::returnData(true, "Account created", $user_id, true);
         } catch (PDOException $e) {
             // Rollback the transaction if something went wrong
             $conn->rollBack();
