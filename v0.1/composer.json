@@ -1,5 +1,6 @@
 {
     "require": {
-        "pear/http_request2": "^2.6"
+        "pear/http_request2": "^2.6",
+        "google/apiclient": "^2.10"
     }
 }
