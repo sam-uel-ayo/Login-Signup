@@ -31,7 +31,7 @@ class CUtils {
 
 
     // Output data to user/ frontend
-    public static function outputData ($status=false, $message=null, $data=null, $exit =false) 
+    public static function outputData ($status=false, $message=null, $data=null, $exit =false, $httpStatus=200) 
     {
         if ($data == null) {
             $data = array();
@@ -55,7 +55,7 @@ class CUtils {
 
 
     // return data to be used in program
-    public static function returnData ($status= false, $message=null, $data=array(), $exit = false, $httpStatus=200) 
+    public static function returnData ($status= false, $message=null, $data=array(), $exit = false) 
     {
         $output = array(
             'status' => $status,
