@@ -20,20 +20,28 @@ class CAuth {
                 return json_decode(CUtils::returnData(false, "Please Signup", $data, true));
             }
 
-            if ($checkUser->status == true) {
-                if (!password_verify($data->password, $checkUser->data->password)) {
-                    return json_decode(CUtils::returnData(false, "Password Incorrect", $data, true));
-                } else {
-                    return json_decode(CUtils::returnData(true, "Logged In", $checkUser->data->id, true));
-                }
-            }
+            if (!password_verify($data->password, $checkUser->data->password)) {
+                return json_decode(CUtils::returnData(false, "Password Incorrect", $data, true));
+            } 
+            // If password is correct and user can login 
+            $access_token = bin2hex(random_bytes(32)); // Generate a unique token
+            $expiry_time = date('Y-m-d H:i:s', strtotime('+30 days')); // Set expiry time for the token - 30 days
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $user_agent = $_SERVER['HTTP_USER_AGENT'];
+            MAuth::userAuthDetails($checkUser->data->id, $access_token, $expiry_time, $ip_address, $user_agent); // Store token and expiry and others in the database - This would later be in the redis
+            
+            setcookie('user_id', $checkUser->data->id, time() + (86400 * 30), "/", "", true, true); // Set cookies with ...
+            setcookie('user_token', $access_token, time() + (86400 * 30), "/", "", true, true); // ..Secure and HttpOnly attributes in user browser
+
+            $outputData = ['user_id' => $checkUser->data->id, 'token' => $access_token];
+            return json_decode(CUtils::returnData(true, "Logged In", $outputData, true));
         } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $data, true);
         }
     }
 
 
-    // User Signup
+    // User Signup - register
     public static function userSignup ($data) // Email, Password, Confirm password, First name, Last name as an object for validation of correct input
     {
         try{
@@ -78,13 +86,23 @@ class CAuth {
             if ($signupUser->status == false) {
                 return json_decode(CUtils::returnData(false, $signupUser->message, $signupUser->data, true));
             }
+
+            $access_token = bin2hex(random_bytes(32)); // Generate a unique token
+            $expiry_time = date('Y-m-d H:i:s', strtotime('+30 days')); // Set expiry time for the token - 30 days
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $user_agent = $_SERVER['HTTP_USER_AGENT'];
+            MAuth::userAuthDetails($signupUser->data->id, $access_token, $expiry_time, $ip_address, $user_agent); // Store token and expiry and others in the database - This would later be in the redis
+            
+            setcookie('user_id', $signupUser->data->id, time() + (86400 * 30), "/", "", true, true); // Set cookies with ...
+            setcookie('user_token', $access_token, time() + (86400 * 30), "/", "", true, true); // ..Secure and HttpOnly attributes in user browser
+            $outputData = ['user_id' => $signupUser->data->id, 'token' => $access_token];
             
             // Send Mail
             $subject = 'Welcome to Our Shop!';
             $body = "<p> $firstname $lastname Thank you for registering with us. We're excited to have you on board!</p>";
             $mailer = json_decode(CUtils::sendEmail($data->email, $subject, $body));
             
-            return json_decode(CUtils::returnData(true, "Registration successful", $data, true));
+            return json_decode(CUtils::returnData(true, "Registration successful", $outputData, true));
 
         } catch (Exception $e) {
 

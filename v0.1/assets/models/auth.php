@@ -177,4 +177,40 @@ class MAuth {
     }
     // Method End
 
+
+    // Store user authentication details - user_id, access_token, expiry_time, ip_address, $user_agent - should later go to redis
+    public static function userAuthDetails ($user_id, $access_token, $expiry_time, $ip_address, $user_agent)
+    {
+        try {
+            $query = "INSERT INTO users_auth_log (user_id, access_token, expiry_time, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)";
+            $stmt = Database::getConnection()->prepare($query);
+
+            $stmt->execute([$user_id, $access_token, $expiry_time, $ip_address, $user_agent]);
+
+        } catch (Exception $e) {
+            return CUtils::returnData(false, $e->getMessage(), $user_id, true);
+        }
+    }
+    // Method End
+
+
+    // Get user authentication details
+    public static function getAuthDetails ($user_id, $access_token)
+    {
+        try {
+            $query = "SELECT * FROM users_auth_log WHERE user_id = ? AND token = ? AND expiry > NOW()";
+            $stmt = Database::getConnection()->prepare($query);
+            
+            $stmt->execute([$user_id, $access_token]);
+            $result = $stmt->fetchObject();
+    
+            if (!$result) {
+                return false;
+            }
+            return $result;
+            
+        } catch (Exception $e) {
+            return CUtils::returnData(false, $e->getMessage(), $user_id, true);
+        }
+    }
 }
