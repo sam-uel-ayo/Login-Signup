@@ -4,7 +4,7 @@ namespace MAuth;
 use Database\Database;
 use CUtils\CUtils;
 use PDO;
-use PDOException; // Change later
+use Exception;
 
 
 class MAuth {
@@ -28,7 +28,7 @@ class MAuth {
             $results = $stmt->fetch(PDO::FETCH_ASSOC);
             return CUtils::returnData(true,null, $results, true); // Results is user token and password
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $email, true);
         }
     } // End of method 
@@ -52,7 +52,7 @@ class MAuth {
                 return CUtils::returnData(true, null, $email, false); // Email doesn't exist - can use
             }
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), null, true);
         }
     } // End of method
@@ -70,13 +70,13 @@ class MAuth {
             $stmt1->bindParam(':password', $password);
             $stmt1->bindParam(':auth', $auth);
             if (!$stmt1->execute()) {
-                throw new PDOException("Failed to insert into users_info");
+                throw new Exception("Failed to insert into users_info");
             }
     
             // Get last inserted ID
             $user_id = $conn->lastInsertId();
             if (!$user_id) {
-                throw new PDOException("Failed to get last inserted ID");
+                throw new Exception("Failed to get last inserted ID");
             }
     
             $stmt2 = $conn->prepare("INSERT INTO users_details (user_id, first_name, last_name) VALUES (:user_id, :first_name, :last_name)");
@@ -84,12 +84,12 @@ class MAuth {
             $stmt2->bindParam(':first_name', $firstname, PDO::PARAM_STR);
             $stmt2->bindParam(':last_name', $lastname, PDO::PARAM_STR);
             if (!$stmt2->execute()) {
-                throw new PDOException("Failed to insert into users_details");
+                throw new Exception("Failed to insert into users_details");
             }
     
             $conn->commit();
             return CUtils::returnData(true, "Account created", $user_id, true);
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             // Rollback the transaction if something went wrong
             $conn->rollBack();
             return CUtils::returnData(false, "Something went wrong: " . $e->getMessage(), [], true);
@@ -117,7 +117,7 @@ class MAuth {
             $profile = $stmt->fetch(PDO::FETCH_ASSOC);
             return CUtils::returnData(true, "User found", $profile, false); // 
             
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), null, true);
         }
     }
@@ -146,7 +146,7 @@ class MAuth {
 
             return CUtils::returnData(true, "Profile Updated", $token, true);
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $token, true);
         }
     }
@@ -171,7 +171,7 @@ class MAuth {
             return CUtils::returnData(true, "Password changed", true);
 
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $email, true);
         }
     }

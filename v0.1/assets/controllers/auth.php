@@ -3,7 +3,7 @@ namespace CAuth;
 
 use CUtils\CUtils;
 use MAuth\MAuth;
-use PDOException; //Change later
+use Exception; 
 
 class CAuth {
 
@@ -27,7 +27,7 @@ class CAuth {
                     return json_decode(CUtils::returnData(true, "Logged In", $checkUser->data->id, true));
                 }
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $data, true);
         }
     }
@@ -86,7 +86,7 @@ class CAuth {
             
             return json_decode(CUtils::returnData(true, "Registration successful", $data, true));
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
 
         }
     }
@@ -108,7 +108,7 @@ class CAuth {
 
             return json_decode(CUtils::returnData(true, $getProfile->message, $getProfile->data, true));
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $token, true);
         }
     }
@@ -145,7 +145,7 @@ class CAuth {
 
             return json_decode(CUtils::returnData(true, $editProfile->message, $editProfile->data, true));
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return json_decode(CUtils::returnData(false, $e->getMessage(), $data, true));
         }
     }
@@ -194,7 +194,7 @@ class CAuth {
             
             return json_decode(CUtils::returnData(true, "Password changed", true));
 
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), $data, true);
         }
     }

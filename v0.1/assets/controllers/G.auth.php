@@ -5,7 +5,7 @@ use CUtils\CUtils;
 use MAuth\MAuth;
 use Google\Client as GoogleClient;
 use Google\Service\Oauth2 as Google_Service_Oauth2;
-use PDOException;
+use Exception;
 
 class GoogleAuth {
 
@@ -81,7 +81,7 @@ class GoogleAuth {
             } else {
                 return json_decode(CUtils::returnData(false, "Google Authentication failed", null, true));
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, $e->getMessage(), null, true);
         }
     }
@@ -107,7 +107,7 @@ class GoogleAuth {
             $mailer = json_decode(CUtils::sendEmail($email, $subject, $body));
 
             return json_decode(CUtils::returnData(true, "Google User Registered", $signupUser->data, true));
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             return CUtils::returnData(false, "Something went wrong try again", null, true);
         }
     }
