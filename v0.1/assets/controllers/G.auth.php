@@ -53,11 +53,10 @@ class GoogleAuth {
                 // Array(
                 //     [access_token] => ya29.A0ARrdaM8J2J3T1l7QWzK7VhJH3G5_n7V9FZfJ_c8hTRdJtY4qYfG8JkA2u5D-9_2N-YiCk
                 //     [expires_in] => 3599
-                //     [refresh_token] => 1//06aG8g2m39AfwC8bF1iR1eQyKf-_J6BHZFYHR7vl2JrN0BQwGkP1vdfN
+                //     [refresh_token] => 
                 //     [scope] => https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
                 //     [token_type] => Bearer
-                //     [id_token] => eyJhbGciOiJSUzI1NiIsImtpZCI6IjE2MDAxMT...
-                // )
+                //     [id_token] => 
             
                 self::$client->setAccessToken($token['access_token']); // Where $token['access_token'] is the access token string
                 
